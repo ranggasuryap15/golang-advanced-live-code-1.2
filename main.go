@@ -93,11 +93,73 @@ func (api *API) AddQuestionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) GetAllQuestionsHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: answer here
+	fileJson, err := api.ReadData()
+	if err!= nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Bad Request"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+
+	resultFileJson, _ := json.Marshal(fileJson)
+
+	w.Write(resultFileJson)
 }
 
 func (api *API) UpdateQuestionHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: answer here
+	fileJson, err := api.ReadData()
+	if err!= nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Bad Request"))
+		return
+	}
+
+	qBody := model.Question{}
+	err = json.NewDecoder(r.Body).Decode(&qBody)
+	if err!= nil {
+		w.WriteHeader(http.StatusBadRequest)
+		errorResp := model.ErrorResponse{
+			Error: "Bad Request",
+		}
+		jsonErrResp, _ := json.Marshal(errorResp)
+		w.Write(jsonErrResp)
+		return
+	}
+
+	// update
+	isID := false
+	for k, q := range fileJson {
+		if q.ID == qBody.ID {
+			isID = true
+			fileJson[k] = qBody
+			err = api.ChangeData(fileJson)
+			if err!= nil {
+				w.WriteHeader(http.StatusBadRequest)
+                errorResp := model.ErrorResponse{
+                    Error: "Bad Request",
+                }
+                jsonErrResp, _ := json.Marshal(errorResp)
+                w.Write(jsonErrResp)
+                return
+            }
+		}
+	}
+
+	if !isID {
+		w.WriteHeader(http.StatusNotFound)
+		errorResp := model.ErrorResponse{
+            Error: "Question not found!",
+        }
+		jsonErrResp, _ := json.Marshal(errorResp)
+		w.Write(jsonErrResp)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	successResp := model.SuccessResponse{
+        Message: "Question updated!",
+    }
+	jsonSuccessResp, _ := json.Marshal(successResp)
+	w.Write(jsonSuccessResp)
 }
 
 type API struct {
