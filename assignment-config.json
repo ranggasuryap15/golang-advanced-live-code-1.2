@@ -1,0 +1,19 @@
+{
+	"name": "golang-advanced-live-code-1.2",
+	"course": "Pemrograman Backend Lanjutan",
+	"title": "Quiz App 2 - Live Code",
+	"order": 1,
+	"topics": [
+		"golang",
+		"I/O",
+		"net/http",
+		"JSON",
+		"template"
+	],
+	"image": "golang-basic",
+	"command": "go test",
+	"totalTestCase": 10,
+	"metadata": {
+		"type": "live-coding"
+	}
+}
